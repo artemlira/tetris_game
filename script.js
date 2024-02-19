@@ -13,9 +13,9 @@ const TETROMINOES = {
     [0, 0, 0],
   ],
   i: [
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
     [1, 1, 1, 1],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
     [0, 0, 0, 0],
   ],
   z: [
@@ -56,8 +56,8 @@ function generateTetromino() {
   tetromino = {
     name,
     matrix,
-    row: 3,
-    column: 5,
+    row: 0,
+    column: 5 - Math.floor(matrix.length / 2),
   };
 }
 
@@ -78,7 +78,7 @@ function drawPlayField() {
 
 function drawTetromino() {
   const name = tetromino.name;
-  const tetrominoMatrixSize = tetromino.matrix.length;
+  const tetrominoMatrixSize = tetromino.matrix?.length;
 
   for (let row = 0; row < tetrominoMatrixSize; row++) {
     for (let column = 0; column < tetrominoMatrixSize; column++) {
