@@ -44,3 +44,7 @@ body {
 .grid > .s {
   background-color: rgb(82, 244, 106);
 }
+
+.grid > .t {
+  background-color: rgb(82, 201, 244);
+}
