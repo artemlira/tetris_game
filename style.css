@@ -25,26 +25,26 @@ body {
   border-radius: 0.3vh;
 }
 
-.grid > .o {
+.grid > .O {
   background-color: rgb(237, 20, 20);
 }
 
-.grid > .j {
+.grid > .J {
   background-color: rgb(208, 255, 0);
 }
 
-.grid > .i {
+.grid > .I {
   background-color: rgb(255, 255, 255);
 }
 
-.grid > .z {
+.grid > .Z {
   background-color: rgb(250, 61, 165);
 }
 
-.grid > .s {
+.grid > .S {
   background-color: rgb(82, 244, 106);
 }
 
-.grid > .t {
+.grid > .T {
   background-color: rgb(82, 201, 244);
 }
