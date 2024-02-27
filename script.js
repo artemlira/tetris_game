@@ -57,7 +57,7 @@ function generateRandomNumber() {
 function generateTetromino() {
   const name = TETROMINO_NAMES[generateRandomNumber()];
   const matrix = TETROMINOES[name];
-  const rowTetro = -2;
+  const rowTetro = 0;
 
   tetromino = {
     name,
