@@ -76,7 +76,40 @@ function placeTetromino() {
       }
     }
   }
+  const filledRows = findFilledRows();
+  romoveFillRows(filledRows);
   generateTetromino();
+}
+
+function romoveFillRows(filledRows) {
+  filledRows.forEach((item) => {
+    const row = item;
+    dropRowsAbove(row);
+  });
+}
+
+function dropRowsAbove(rowDelete) {
+  for (let row = rowDelete; row > 0; row--) {
+    playField[row] = playField[row - 1];
+  }
+}
+
+function findFilledRows() {
+  const fillRows = [];
+
+  for (let row = 0; row < PLAYFIELD_ROWS; row++) {
+    let filledColumns = 0;
+    for (let column = 0; column < PLAYFIELD_COLUMNS; column++) {
+      if (playField[row][column] != 0) {
+        filledColumns++;
+      }
+    }
+    if (PLAYFIELD_COLUMNS === filledColumns) {
+      fillRows.push(row);
+    }
+  }
+
+  return fillRows;
 }
 
 generatePlayField();
@@ -100,6 +133,7 @@ function drawTetromino() {
 
   for (let row = 0; row < tetrominoMatrixSize; row++) {
     for (let column = 0; column < tetrominoMatrixSize; column++) {
+      if (isOutsideOfTopboard(row)) continue;
       if (!tetromino.matrix[row][column]) continue;
       const cellIndex = convertPositionIndex(tetromino.row + row, tetromino.column + column);
       // cells[cellIndex].innerHTML = showRotated[row][column];
@@ -186,6 +220,26 @@ function moveTetrominoRight() {
   }
 }
 
+function moveDown() {
+  moveTetrominoDown();
+  draw();
+  stopLoop();
+  startLoop();
+}
+let timeId = null;
+moveDown();
+
+function startLoop() {
+  setTimeout(() => {
+    timeId = requestAnimationFrame(moveDown);
+  }, 700);
+}
+
+function stopLoop() {
+  cancelAnimationFrame(timeId);
+  timeId = clearTimeout(timeId);
+}
+
 function isValid() {
   const matrixSize = tetromino.matrix.length;
   for (let row = 0; row < matrixSize; row++) {
@@ -202,6 +256,11 @@ function isValid() {
 
   return true;
 }
+
+function isOutsideOfTopboard(row) {
+  return tetromino.row + row < 0;
+}
+
 function isOutsideOfGameboard(row, column) {
   return (
     tetromino.matrix[row][column] &&
@@ -212,5 +271,5 @@ function isOutsideOfGameboard(row, column) {
 }
 
 function hasCollisions(row, column) {
-  return tetromino.matrix[row][column] && playField[tetromino.row + row][tetromino.column + column];
+  return tetromino.matrix[row][column] && playField[tetromino.row + row]?.[tetromino.column + column];
 }
