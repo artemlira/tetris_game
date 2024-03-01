@@ -6,8 +6,14 @@ let timer = document.querySelector('.timer');
 const play = document.querySelector(`.play`);
 const stop = document.querySelector(`.stop`);
 const pause = document.querySelector(`.pause`);
-const btn = document.querySelector(`.btn-restart`);
+const btnRestart = document.querySelector(`.btn-restart`);
 const overlay = document.querySelector('.overlay');
+const up = document.querySelector('.up');
+const left = document.querySelector('.left');
+const right = document.querySelector('.right');
+const down = document.querySelector('.down');
+const buttons = document.querySelectorAll('.game-buttons i');
+let nextFigure = null;
 let timerId = null;
 let timeId = null;
 let playField;
@@ -16,9 +22,9 @@ let score = 0;
 let seconds = 0;
 let minutes = 0;
 let hours = 0;
-// let interval;
 let isPaused = false;
 let isGameOver = false;
+let cells;
 scoreElement.innerHTML = score;
 
 const TETROMINOES = {
@@ -68,6 +74,28 @@ function updateTime() {
     .toString()
     .padStart(2, '0')}`;
 }
+
+function init() {
+  score = 0;
+  seconds = 0;
+  minutes = 0;
+  hours = 0;
+  scoreElement.innerHTML = 0;
+  isGameOver = false;
+  generatePlayField();
+  generateTetromino();
+  cells = document.querySelectorAll('.grid div');
+  moveDown();
+}
+
+function restartGame() {
+  document.querySelector('.grid').innerHTML = '';
+  overlay.style.display = 'none';
+  init();
+}
+
+btnRestart.addEventListener('click', restartGame);
+stop.addEventListener('click', restartGame);
 
 function convertPositionIndex(row, column) {
   return row * PLAYFIELD_COLUMNS + column;
@@ -120,7 +148,7 @@ function placeTetromino() {
   const matrixSize = tetromino.matrix.length;
   for (let row = 0; row < matrixSize; row++) {
     for (let column = 0; column < matrixSize; column++) {
-      if (isOutsideOfGameboard(row)) {
+      if (isOutsideOfTopboard(row)) {
         isGameOver = true;
         return;
       }
@@ -143,10 +171,14 @@ function romoveFillRows(filledRows) {
 }
 
 function dropRowsAbove(rowDelete) {
-  console.log(rowDelete);
+  playField[rowDelete].forEach((i) =>
+    document.querySelector('.' + i).classList.add('animate__animated', 'animate__bounceOut'),
+  );
+
   for (let row = rowDelete; row > 0; row--) {
     playField[row] = playField[row - 1];
   }
+
   playField[0] = new Array(PLAYFIELD_COLUMNS).fill(0);
 }
 
@@ -170,7 +202,7 @@ function findFilledRows() {
 
 generatePlayField();
 generateTetromino();
-const cells = document.querySelectorAll('.grid div');
+cells = document.querySelectorAll('.grid div');
 
 function drawPlayField() {
   for (let row = 0; row < PLAYFIELD_ROWS; row++) {
@@ -220,6 +252,9 @@ function rotate() {
 }
 
 document.addEventListener('keydown', onKeyDown);
+document.addEventListener('keyup', () => {
+  buttons.forEach((btn) => btn.classList.remove('active'));
+});
 play.addEventListener('click', () => {
   moveDown();
   if (isPaused) {
@@ -230,6 +265,11 @@ play.addEventListener('click', () => {
 pause.addEventListener('click', () => {
   togglePauseGame();
 });
+
+up.addEventListener('click', rotate);
+left.addEventListener('click', moveTetrominoLeft);
+right.addEventListener('click', moveTetrominoRight);
+down.addEventListener('click', dropTetrominoDown);
 
 function onKeyDown(e) {
   if (e.key === 'Escape') {
@@ -242,15 +282,19 @@ function onKeyDown(e) {
         break;
       case 'ArrowUp':
         rotate();
+        up.classList.add('active');
         break;
       case 'ArrowDown':
         moveTetrominoDown();
+        down.classList.add('active');
         break;
       case 'ArrowLeft':
         moveTetrominoLeft();
+        left.classList.add('active');
         break;
       case 'ArrowRight':
         moveTetrominoRight();
+        right.classList.add('active');
         break;
     }
   }
@@ -306,6 +350,7 @@ function moveDown() {
   moveTetrominoDown();
   draw();
   stopLoop();
+  stopTimer();
   startLoop();
   startTimer();
   if (isGameOver) {
@@ -316,9 +361,8 @@ function moveDown() {
 function startTimer() {
   timerId = setTimeout(() => {
     requestAnimationFrame(updateTime);
-  }, 1000);
+  }, 700);
 }
-console.log(seconds);
 
 function startLoop() {
   timeId = setTimeout(() => {
@@ -330,6 +374,9 @@ function stopLoop() {
   cancelAnimationFrame(timeId);
   clearTimeout(timeId);
   timeId = null;
+}
+
+function stopTimer() {
   cancelAnimationFrame(timerId);
   clearTimeout(timerId);
   timerId = null;
@@ -337,11 +384,7 @@ function stopLoop() {
 
 function togglePauseGame() {
   isPaused ? startLoop() : stopLoop();
-  // if (isPaused === false) {
-  //   stopLoop();
-  // } else {
-  //   startLoop();
-  // }
+  isPaused ? startTimer() : stopTimer();
   isPaused = !isPaused;
 }
 
